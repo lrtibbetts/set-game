@@ -8,7 +8,9 @@
 ; nums: "1" "2" "3"
 ; shading: "solid" "striped" "outline"
 (define-struct card (color shape num shading))
-(define my-card (card "red" "oval" "1" "solid"))
+(define card1 (card "red" "oval" "1" "solid"))
+(define card2 (card "green" "squiggle" "3" "striped"))
+(define card3 (card "purple" "diamond" "2" "outline"))
 
 ; deck of all 80 cards
 ; https://beautifulracket.com/explainer/loops.html
@@ -33,7 +35,7 @@
 (define (print-row card1 card2 card3)
     (flomap->bitmap (flomap-ht-append (bitmap->flomap (print card1))
                                       (bitmap->flomap (print card2))
-                                      (bitmap->flomap (print card2)))))
+                                      (bitmap->flomap (print card3)))))
   
 ; todo: print 12 cards at a time
 ; allow the user to select three cards
