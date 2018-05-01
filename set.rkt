@@ -16,24 +16,26 @@
 ; shuffled deck
 (define shuffled-deck (shuffle my-deck))
 
-; print a single card
-(define (print card)
+; get a single card and scale it
+(define (get-card card)
   (let ([img (string-append (card-color card) (card-shape card)
                             (card-num card) (card-shading card))])
-    (flomap->bitmap (flomap-scale (bitmap->flomap (make-object bitmap% (string-append "pngs\\" img ".png"))) 1/5))))
+    (flomap-scale (bitmap->flomap
+                   (make-object bitmap%
+                     (string-append "pngs\\" img ".png"))) 1/5)))
 
-; print a row of 3 cards
-(define (print-row a b c)
-    (flomap->bitmap (flomap-ht-append (bitmap->flomap (print a))
-                                      (bitmap->flomap (print b))
-                                      (bitmap->flomap (print c)))))
+; append 3 cards to make a row
+(define (row a b c)
+  (flomap-ht-append (get-card a) (get-card b) (get-card c)))
 
 ; print 12 cards (4 rows of 3)
 (define (print-4-rows deck)
-  (flomap->bitmap (flomap-vl-append (bitmap->flomap (print-row (list-ref deck 0) (list-ref deck 1) (list-ref deck 2)))
-                                    (bitmap->flomap (print-row (list-ref deck 3) (list-ref deck 4) (list-ref deck 5)))
-                                    (bitmap->flomap (print-row (list-ref deck 6) (list-ref deck 7) (list-ref deck 8)))
-                                    (bitmap->flomap (print-row (list-ref deck 9) (list-ref deck 10) (list-ref deck 11))))))
+  (flomap->bitmap
+   (flomap-vl-append
+    (row (list-ref deck 0) (list-ref deck 1) (list-ref deck 2))
+    (row (list-ref deck 3) (list-ref deck 4) (list-ref deck 5))
+    (row (list-ref deck 6) (list-ref deck 7) (list-ref deck 8))
+    (row (list-ref deck 9) (list-ref deck 10) (list-ref deck 11)))))
 
 ; helper fxns for set?:
 ; check that 3 values are equal
@@ -57,12 +59,28 @@
                (not-equal? (card-num a) (card-num b) (card-num c)))
            (or (my-equal? (card-shading a) (card-shading b) (card-shading c))
                (not-equal? (card-shading a) (card-shading b) (card-shading c))))
-         (write "You found a set!") (write "That is not a valid set")))
+         (display "You found a set!") (display "That is not a valid set")))
 
-; testing cards
-(define card1 (card "red" "oval" "1" "solid"))
-(define card2 (card "green" "squiggle" "3" "striped"))
-(define card3 (card "purple" "diamond" "2" "outline"))
+; convert user input into cards and determine whether or not they are a set
+(define (check-input str deck)
+  (let* ([a (char->integer (string-ref str 0))] 
+         [b (char->integer (string-ref str 2))] ; ignore spaces
+         [c (char->integer (string-ref str 4))])
+    (set? (list-ref deck (- a 49))
+          (list-ref deck (- b 49))
+          (list-ref deck (- c 49))))) ; adjust for zero indexing and ascii
 
-; allow the user to select three cards
-; let the user know whether or not they found a set
+(define (print-check card)
+  (let ([img (string-append (card-color card) (card-shape card)
+                            (card-num card) (card-shading card))])
+    (flomap->bitmap (flomap-scale
+                     (bitmap->flomap
+                      (make-object bitmap%
+                        (string-append "pngs\\" img ".png"))) 1/5))))
+
+; play the game of SET:
+(displayln "Welcome to the game of SET!")
+(print-4-rows shuffled-deck)
+(displayln "Indicate a set by entering the positions of the 3 cards (e.g. 1 = top-left)")
+(define input (read-line))
+(check-input input shuffled-deck)
