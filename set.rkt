@@ -69,22 +69,38 @@
          [c (string->number third-card)])
     (set? (list-ref deck (- a 1)) ; subtract 1 to adjust for zero indexing 
           (list-ref deck (- b 1))
-          (list-ref deck (- c 1))))) 
+          (list-ref deck (- c 1)))))
+
+; remove a SET from the deck after it's found
+(define (remove-set deck a b c)
+  (let* ([first-card (list-ref deck a)]
+         [second-card (list-ref deck b)]
+         [third-card (list-ref deck c)])
+    (remove* (list first-card second-card third-card) deck)))
 
 ; play a game of SET
 (define (play-game my-bool my-deck)
   (when (equal? my-bool #t)
     (println (flomap->bitmap (rows my-deck)))
     (displayln "Indicate a set by entering the positions of the 3 cards one at a time (e.g. 1 = top-left)")
-    (define first-card (read-line))
-    (define second-card (read-line))
-    (define third-card (read-line))
-    (check-input first-card second-card third-card my-deck)
-    (displayln "Play again? (Y/N)")
+    (define a (read-line))
+    (define b (read-line))
+    (define c (read-line))
+    (check-input a b c my-deck)
+    (displayln "Keep playing? (Y/N)")
     (define str (read-line))
-    (if (equal? str "Y") (play-game #t (shuffle my-deck)) (play-game #f my-deck))))
+    (if (and (equal? str "Y") (> (length my-deck) 6)) ; ensure that there will still be 3 cards
+        (play-game #t (remove-set
+                       my-deck
+                       (- (string->number a) 1)
+                       (- (string->number b) 1)
+                       (- (string->number c) 1)))
+        (play-game #f my-deck))))
 
 ; start game
 (displayln "Welcome to the game of SET!")
 (play-game #t shuffled-deck)
 (displayln "Thanks for playing!")
+
+; fxn to see if there are any more sets left
+; fxn to add more cards if there are no sets
