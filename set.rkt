@@ -12,6 +12,11 @@
 ; specify color, shape, num, and shading
 (define-struct card (color shape num shading))
 
+; example set
+(define first-card (card "red" "oval" "1" "striped"))
+(define second-card (card "purple" "squiggle" "2" "solid"))
+(define third-card (card "green" "diamond" "3" "outline"))
+
 ; deck of all 81 cards
 (define my-deck
   ; for*/list generates a new list with all possible combinations
@@ -162,6 +167,11 @@
     (define a (string->number (read-line)))
     (define b (string->number (read-line)))
     (define c (string->number (read-line)))
+    ; display the chosen set
+    (display "Your cards: ")
+    (println (flomap->bitmap (row (list-ref my-deck (- a 1)) ; subtract 1 to adjust for zero indexing 
+                                  (list-ref my-deck (- b 1))
+                                  (list-ref my-deck (- c 1)))))
     ; check if the specified cards make a set
     ; let the user know whether or not they found a set
     (if (check-input a b c my-deck)
@@ -178,8 +188,13 @@
             (play-game #t my-deck))
         (play-game #f my-deck))))
 
-; start game
-(displayln "Welcome to the game of SET!")
-; utilize the shuffled deck of 81 cards
+; explain the game
+(displayln "Welcome to the game of SET! \n")
+(displayln "The goal of SET is to find as many SETS as you can. Here is an example of a valid SET:")
+(println (flomap->bitmap (row first-card second-card third-card)))
+(displayln "Each characteristic (color, shape, number, and shading) needs to be all the same or all different. \n")
+(displayln "Let's play!\n")
+
+; start the game
 (play-game #t shuffled-deck)
 (displayln "Thanks for playing!")
