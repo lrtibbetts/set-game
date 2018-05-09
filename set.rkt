@@ -146,9 +146,9 @@
 ; function called if the user can't find any sets in the initial 12 cards
 (define (print-extra deck)
   (println (flomap->bitmap (rows deck)))
-  (println (flomap->bitmap (row (list-ref my-deck 12)
-                                (list-ref my-deck 13)
-                                (list-ref my-deck 14)))))
+  (println (flomap->bitmap (row (list-ref deck 12)
+                                (list-ref deck 13)
+                                (list-ref deck 14)))))
 
 ; play a game of SET
 ; my-bool: determines whether or not to continue playing
@@ -160,9 +160,12 @@
     ; add more cards if the user can't find any sets
     ; only allow three extra cards to be added (odds of not finding a set out of 15 cards = 2500:1)
     (define str (read-line))
-    (when (equal? str "N")
+    (when (and (equal? str "N") (>= (length my-deck) 15)) ; check that there are 15 cards in the deck
       (displayln "Adding three more cards (up to a total of 15)...")
       (print-extra my-deck))
+    ; instruct the user accordingly if there are no more cards to add
+    (cond [(and (equal? str "N") (not (>= (length my-deck) 15)))
+           (displayln "No more cards to add! Enter 1, 2, 3 and then N to end the game.")])
     (displayln "Indicate a set by entering the positions of the 3 cards one at a time (e.g. 1 = top-left)")
     (define a (string->number (read-line)))
     (define b (string->number (read-line)))
@@ -179,8 +182,9 @@
         (displayln "That is not a valid set"))
     (displayln "Keep playing? (Y/N)")
     (define new-str (read-line))
-    (if (and (equal? new-str "Y")
-             (>= (length my-deck) 6))
+    (if (and (>= (length my-deck) 6)
+             (equal? new-str "Y"))
+        ; ensure that there are at least 6 cards left in the deck
         ; call play-game recursively with my-bool set to either #t or #f
         ; only remove valid sets from the deck
         (if (check-input a b c my-deck)
@@ -195,6 +199,6 @@
 (displayln "Each characteristic (color, shape, number, and shading) needs to be all the same or all different. \n")
 (displayln "Let's play!\n")
 
-; start the game
+; start the game using the shuffled deck
 (play-game #t shuffled-deck)
 (displayln "Thanks for playing!")
